@@ -1,0 +1,73 @@
+services:
+  ansible-controller:
+    image: control-node
+    container_name: ansible-controller
+    networks:
+      - ubuntu-net
+    networks:
+      ubuntu-net:
+        ipv4_address: 10.89.0.2
+    hostname: ansible-controller
+    environment:
+      - USER=automation
+      - PASSWORD=automation
+    #volumes:
+    #  - ./ansible-controller:/home/automation
+    command: /bin/bash -c "sleep infinity"
+    stdin_open: true
+    tty: true
+    volumes:
+      - my_volume:/home/automation                    #volume 
+      - my_volume_shared:/home/automation/shared      #shared volume   
+      - ./ansible-controller:/home/automation/onhost  #bind mount
+
+  servera:
+    image: control-node
+    container_name: servera
+    networks:
+      ubuntu-net:
+        ipv4_address: 10.89.0.3
+    hostname: servera
+    environment:
+      - USER=automation
+      - PASSWORD=automation
+    #volumes:
+    #  - ./servera:/home/automation
+    command: /bin/bash -c "sleep infinity"
+    stdin_open: true
+    tty: true
+    volumes:
+      - my_volume:/home/automation                   #volume     
+      - my_volume_shared:/home/automation/shared     #shared volume
+      - ./servera:/home/automation/onhost            #bind mount
+
+  serverb:
+    image: control-node  
+    container_name: serverb
+    networks:
+      ubuntu-net:
+        ipv4_address: 10.89.0.4
+    hostname: serverb
+    environment:
+      - USER=automation
+      - PASSWORD=automation
+    #volumes:
+    #  - ./serverb:/home/automation
+    command: /bin/bash -c "sleep infinity"
+    stdin_open: true
+    tty: true
+    volumes:
+      - my_volume:/home/automation                   #volume  
+      - my_volume_shared:/home/automation/shared     #shared volume
+      - ./serverb:/home/automation/onhost            #bind mount
+
+networks:
+  ubuntu-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.89.0.0/16
+        
+volumes:
+  my_volume_shared:                                  #volume shared between containers
+  my_volume: 
