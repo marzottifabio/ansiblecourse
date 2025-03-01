@@ -2,6 +2,13 @@
 
 ## Module 1
 
+### Memo, how to start the environment for the course
+```bash
+a- open 'Terminale'
+b- podman machine start
+c- docker-compose -f "C:\Users\D00a027\Documents\Podman\ansiblecourse\compose.yaml" up -d
+```
+
 ### Control Node Setup
 
 1. Create and configure automation user (made in the the dockerfile):
@@ -21,6 +28,7 @@ automation ALL=(ALL) NOPASSWD:ALL
 
 3. Test the configuration:
 ```bash
+podman exec -it ansible-controller /bin/bash
 su automation
 ```
 
@@ -54,34 +62,18 @@ ssh-copy-id serverb
 
 8. Test SSH connectivity:
 ```bash
+su automation
 ssh servera  # Should connect without password
 ssh serverb  # Should connect without password
 ```
-I M HERE !!!!!
 
 9. Install Ansible:
 ```bash
 su automation
-sudo yum install ansible
+sudo apt-get update
+sudo apt-get install ansible
+sudo ansible --version
 ```
-
-### Inventory Setup
-
-1. Create inventory file in automation user's home directory:
-```ini
-[webservers]
-servera
-serverb
-```
-
-2. Test connectivity with Ansible:
-```bash
-ansible webservers -m ping -i inventory
-```
-
-Note: A green "SUCCESS" status indicates proper configuration.
-
-> Ad hoc commands explanation: Ansible ad hoc commands are quick, simple commands that allow executing specific tasks on one or more managed nodes without writing a full playbook. They use the `/usr/bin/ansible` command-line tool and are ideal for rarely repeated tasks or one-time operations.
 
 ### Server A Setup
 
@@ -135,3 +127,36 @@ All nodes should have these entries in their hosts file:
 10.89.0.3       servera servera
 10.89.0.4       serverb serverb
 ```
+
+## Module 2
+
+### Inventory files
+
+1. Create inventory file in automation user's home directory (file name inventory):
+```ini
+servera
+[group1]
+serverb
+[group2]
+servera
+[group12:children]
+group1
+group2
+```
+
+2. Test connectivity with Ansible:
+```bash
+ansible webservers -m ping -i inventory
+```
+
+Note: A green "SUCCESS" status indicates proper configuration.
+
+> Ad hoc commands explanation: Ansible ad hoc commands are quick, simple commands that allow executing specific tasks on one or more managed nodes without writing a full playbook. They use the `/usr/bin/ansible` command-line tool and are ideal for rarely repeated tasks or one-time operations.
+Inventory files can be written in ini o yaml format.
+
+```bash
+ansible all --list-hosts -i inventory
+ansible ungrouped --list-hosts -i inventory
+ansible group1 --list-hosts -i inventory
+```
+
